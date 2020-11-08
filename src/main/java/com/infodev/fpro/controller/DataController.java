@@ -1,9 +1,11 @@
 package com.infodev.fpro.controller;
 
 import java.util.List;
-import java.util.Date;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.infodev.fpro.repository.DataRepository;
+import com.infodev.fpro.service.DataService;
 import com.infodev.fpro.dto.DataCreationDto;
 import com.infodev.fpro.model.Data;
 
@@ -21,10 +24,14 @@ public class DataController {
 	@Autowired
 	DataRepository dataRepository;
 	
+	@Autowired
+	DataService dataService;
+	
+	
 	@RequestMapping (value="/data", method = RequestMethod.GET)
-	public  List<Data>getAllData()
-	{
-		return dataRepository.findAll();
+	public  ResponseEntity<Object> listAllData(){
+		List<Data> data=dataService.listAllData();
+		return new ResponseEntity<Object>(data, HttpStatus.OK);
 	
 	}
 	
@@ -35,15 +42,10 @@ public class DataController {
 	}
 	
 	@RequestMapping (value="/data", method = RequestMethod.POST)
-	public Data createData(DataCreationDto dataCreationDto)
+	public ResponseEntity<Object> createData(DataCreationDto dataCreationDto)
 	{
-		Data data =new Data();
-		data.setAddress(dataCreationDto.getAddress());
-		data.setCheckedInDate(new Date());
-		data.setFullName(dataCreationDto.getFullName());
-		data.setSerialNumber(dataCreationDto.getSerialNumber());
-		data.setTemperature(dataCreationDto.getTemperature());
-		return dataRepository.save(data);
+		dataService.addData(dataCreationDto);
+		return new ResponseEntity<Object>("Data Added Successfully", HttpStatus.CREATED);
 	}
 	
 	@RequestMapping (value="/data", method = RequestMethod.PUT)
